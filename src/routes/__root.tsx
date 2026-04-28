@@ -1,6 +1,7 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { AnimatePresence, motion } from "framer-motion";
 
 import appCss from "../styles.css?url";
 
@@ -60,7 +61,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="bg-noise bg-background">
         {children}
         <Scripts />
       </body>
@@ -69,12 +70,24 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const router = useRouterState();
+  const pathname = router.location.pathname;
+
   return (
     <>
       <Navbar />
-      <main>
-        <Outlet />
-      </main>
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={pathname}
+          initial={{ opacity: 0, filter: "blur(8px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, filter: "blur(8px)" }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="min-h-screen"
+        >
+          <Outlet />
+        </motion.main>
+      </AnimatePresence>
       <Footer />
     </>
   );
